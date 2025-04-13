@@ -815,6 +815,14 @@ function handleCollapseToggle(normalizedSubjectKey, isCurrentTab) {
 
 // --- Tab Switching ---
 function switchTab(tabIdToActivate) {
+    // Prevent switching to the same tab (optimization)
+    if (tabIdToActivate === activeTabId && document.getElementById(tabIdToActivate).classList.contains('active')) {
+        console.log('Tab already active:', tabIdToActivate);
+        return;
+    }
+
+    console.log('Switching to tab:', tabIdToActivate);
+
     // Deactivate previous tab
     const currentActiveTab = tabNavigation.querySelector('.tab-button.active');
     const currentActivePanel = tabContent.querySelector('.tab-panel.active');
@@ -832,28 +840,42 @@ function switchTab(tabIdToActivate) {
     if (!newActiveTab) { // Safety check
         console.error("Tab button not found:", tabIdToActivate);
         // Default to current tab if requested tab is invalid
-        switchTab('tab-current');
+        if (tabIdToActivate !== 'tab-current') {
+            switchTab('tab-current');
+        } else {
+            console.error("Even the default tab is missing!");
+        }
         return;
     }
+
     const newActivePanelId = newActiveTab.getAttribute('aria-controls');
     const newActivePanel = document.getElementById(newActivePanelId);
 
     if (newActiveTab) {
+        // Ensure the tab is visible by scrolling it into view if needed
+        newActiveTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+
+        // Add active class and update attributes
         newActiveTab.classList.add('active');
         newActiveTab.setAttribute('aria-selected', 'true');
-         newActiveTab.setAttribute('tabindex', '0'); // Make active tab focusable
+        newActiveTab.setAttribute('tabindex', '0'); // Make active tab focusable
         activeTabId = tabIdToActivate; // Update state variable
     }
+
     if (newActivePanel) {
-        newActivePanel.classList.add('active');
-        renderTasks(); // Re-render based on the newly active tab (will call correct render function)
+        // Add a small delay to allow for smooth transition
+        setTimeout(() => {
+            newActivePanel.classList.add('active');
+            renderTasks(); // Re-render based on the newly active tab
+        }, 10);
     } else {
-         console.error("Tab panel not found:", newActivePanelId);
-         // Optionally clear content area or show error
-         tabContent.innerHTML = `<p class="empty-list-message">Error: Content panel for ${tabIdToActivate} not found.</p>`;
+        console.error("Tab panel not found:", newActivePanelId);
+        // Optionally clear content area or show error
+        tabContent.innerHTML = `<p class="empty-list-message">Error: Content panel for ${tabIdToActivate} not found.</p>`;
     }
 
-    saveState(); // Save the active tab ID
+    // Save state to persist the active tab
+    saveState();
 }
 
 // --- Subject Management ---
@@ -1127,7 +1149,7 @@ async function pauseTask(taskId) {
 }
 
 async function stopTask(taskId) {
-    const { task, sourceArray, type } = findTaskAndSource(taskId);
+    const { task } = findTaskAndSource(taskId);
     if (!task || (task.state !== 'running' && task.state !== 'paused')) {
         console.warn("Cannot stop task - not running or paused.", task);
         return;
@@ -1264,7 +1286,6 @@ async function deleteTask(taskId) {
     }
 
     // Remove the task from its source array
-    let wasFinishedTask = false;
     if (sourceArray === currentTasks) {
         currentTasks = currentTasks.filter(t => t.id !== taskId);
     } else if (sourceArray === exerciseTasks) {
@@ -1273,7 +1294,6 @@ async function deleteTask(taskId) {
         rewardTasks = rewardTasks.filter(t => t.id !== taskId);
     } else if (sourceArray === finishedTasks) {
         finishedTasks = finishedTasks.filter(t => t.id !== taskId);
-        wasFinishedTask = true;
         // Optional: Adjust total credits if deleting a finished task that earned credits?
         // Let's NOT adjust credits for simplicity.
     }
@@ -2288,26 +2308,68 @@ function escapeHtml(unsafe) {
 
 // --- Global Event Listeners Setup ---
 function setupEventListeners() {
-    // Tab Navigation Clicks
+    // Tab Navigation Clicks - Improved for mobile
     tabNavigation.addEventListener('click', (e) => {
         const button = e.target.closest('button[role="tab"]');
-        if (button && !button.classList.contains('active')) {
-            // Cancel drag mode if switching tabs
-            if (draggableTaskId) {
-                console.log("Cancelling drag due to tab switch.");
-                const draggedLi = document.querySelector(`li[data-id="${draggableTaskId}"]`);
-                if (draggedLi) draggedLi.classList.remove('dragging'); // Clean up style
-                draggableTaskId = null;
-                // Render will happen in switchTab anyway
+        if (button) {
+            // Always handle the click, even if it's the active tab
+            // This helps with mobile touch issues where the first tap might not register properly
+
+            // Only do the tab switching logic if it's not already active
+            if (!button.classList.contains('active')) {
+                // Cancel drag mode if switching tabs
+                if (draggableTaskId) {
+                    console.log("Cancelling drag due to tab switch.");
+                    const draggedLi = document.querySelector(`li[data-id="${draggableTaskId}"]`);
+                    if (draggedLi) draggedLi.classList.remove('dragging'); // Clean up style
+                    draggableTaskId = null;
+                    // Render will happen in switchTab anyway
+                }
+                // Cancel selection mode if switching tabs
+                if (selectionMode) {
+                    console.log("Cancelling selection mode due to tab switch.");
+                    toggleSelectionMode(); // This handles UI reset and state change
+                }
+                switchTab(button.id);
             }
-             // Cancel selection mode if switching tabs
-             if (selectionMode) {
-                 console.log("Cancelling selection mode due to tab switch.");
-                 toggleSelectionMode(); // This handles UI reset and state change
-             }
-            switchTab(button.id);
+
+            // Prevent event bubbling
+            e.stopPropagation();
         }
     });
+
+    // Add touchend handler for better mobile experience
+    tabNavigation.addEventListener('touchend', (e) => {
+        const button = e.target.closest('button[role="tab"]');
+        if (button) {
+            // Always prevent default to avoid double-tap zoom and other issues
+            e.preventDefault();
+
+            // Only switch tabs if it's not already active
+            if (!button.classList.contains('active')) {
+                // Cancel any ongoing operations
+                if (draggableTaskId) {
+                    const draggedLi = document.querySelector(`li[data-id="${draggableTaskId}"]`);
+                    if (draggedLi) draggedLi.classList.remove('dragging');
+                    draggableTaskId = null;
+                }
+                if (selectionMode) {
+                    toggleSelectionMode();
+                }
+
+                // Add a small delay to allow the button press animation to complete
+                setTimeout(() => {
+                    switchTab(button.id);
+                }, 50);
+            }
+        }
+    }, { passive: false });
+
+    // Add touchstart handler to provide immediate feedback
+    tabNavigation.addEventListener('touchstart', () => {
+        // Just let the default behavior happen for visual feedback
+        // The CSS will handle the visual state
+    }, { passive: true });
 
     // Task Actions & Options (Delegated from Tab Content)
     tabContent.addEventListener('click', (e) => {

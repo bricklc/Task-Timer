@@ -1,6 +1,7 @@
 /* General Reset & Material Design Light Theme */
 :root {
     --primary-color: #1a73e8; /* Google Blue */
+    --primary-color-rgb: 26, 115, 232; /* RGB values for primary color */
     --primary-color-dark: #1558b0;
     --primary-color-light: #d2e3fc;
     --danger-color: #d93025; /* Google Red */
@@ -41,6 +42,7 @@
 /* Dark Mode Variables */
 body.dark-mode {
     --primary-color: #8ab4f8; /* Google Blue - Lighter for dark */
+    --primary-color-rgb: 138, 180, 248; /* RGB values for primary color in dark mode */
     --primary-color-dark: #aecbfa;
     --primary-color-light: #283142; /* Darker background shade */
     --danger-color: #f28b82; /* Google Red - Lighter */
@@ -174,10 +176,19 @@ header h1 {
     border-bottom: 1px solid var(--border-color); /* Use variable */
     background-color: var(--background-color); /* Ensure background - Use variable */
     transition: border-color 0.3s ease, background-color 0.3s ease;
+    overflow-x: auto; /* Allow horizontal scrolling on small screens */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    scrollbar-width: none; /* Hide scrollbar in Firefox */
+    -ms-overflow-style: none; /* Hide scrollbar in IE/Edge */
+}
+
+/* Hide scrollbar in Chrome/Safari */
+#tab-navigation::-webkit-scrollbar {
+    display: none;
 }
 
 .tab-button {
-    padding: 12px 16px; /* Reduced padding slightly for more tabs */
+    padding: 14px 8px; /* Increased vertical padding, reduced horizontal for mobile */
     font-size: 0.95em; /* Slightly smaller text */
     font-weight: 500;
     color: var(--secondary-text-color); /* Use variable */
@@ -185,11 +196,16 @@ header h1 {
     border: none;
     border-bottom: 2px solid transparent;
     cursor: pointer;
-    transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+    transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease, transform 0.1s ease;
     margin-bottom: -1px; /* Overlap border */
     flex-grow: 1; /* Make tabs fill space */
     text-align: center;
     white-space: nowrap; /* Prevent wrapping */
+    min-height: 48px; /* Minimum touch target height for mobile */
+    touch-action: manipulation; /* Prevent browser handling of touch actions */
+    -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+    transform: translateZ(0); /* Enable hardware acceleration for smoother animations */
+    will-change: transform; /* Hint to browser about properties that will change */
 }
 
 .tab-button:hover {
@@ -197,9 +213,24 @@ header h1 {
     color: var(--text-color); /* Use variable */
 }
 
+/* Add active state for better touch feedback - only when pressing */
+.tab-button:active:not(.active) {
+    background-color: rgba(var(--primary-color-rgb, 26, 115, 232), 0.15);
+    transform: scale(0.98);
+}
+
+/* Subtle feedback when pressing an already active tab */
+.tab-button.active:active {
+    transform: scale(0.99);
+}
+
 .tab-button.active {
     color: var(--primary-color); /* Use variable */
     border-bottom-color: var(--primary-color); /* Use variable */
+    border-bottom-width: 3px; /* Make the indicator more visible */
+    background-color: rgba(var(--primary-color-rgb, 26, 115, 232), 0.08); /* Light background for active tab */
+    transform: none; /* Ensure no transform is applied to active tab by default */
+    transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease, transform 0.1s ease;
 }
 
 .tab-button:focus {
@@ -222,10 +253,13 @@ header h1 {
 
 .tab-panel {
     display: none; /* Hide inactive tabs */
+    opacity: 0;
+    transition: opacity 0.2s ease;
 }
 
 .tab-panel.active {
     display: block; /* Show active tab */
+    opacity: 1;
 }
 
 .tab-panel h2 {
@@ -996,6 +1030,87 @@ body.dark-mode .schedule-task-block[data-task-type="reward"] {
     color: var(--primary-color); /* Use variable */
 }
 
+
+/* Media Queries for Responsive Design */
+@media (max-width: 768px) {
+    /* Adjust app container for mobile */
+    #app {
+        margin: 10px auto;
+        max-width: 100%;
+        max-height: calc(100vh - 20px);
+        border-radius: 4px;
+    }
+
+    /* Adjust header for mobile */
+    header {
+        padding: 10px;
+    }
+
+    header h1 {
+        font-size: 1.2em;
+    }
+
+    /* Make tab buttons more tappable */
+    .tab-button {
+        padding: 16px 6px;
+        min-width: 70px;
+        min-height: 50px; /* Ensure good tap target size */
+        font-size: 1em; /* Slightly larger text for better visibility */
+        font-weight: 600; /* Make text more visible */
+    }
+
+    /* Improve tab navigation on mobile */
+    #tab-navigation {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    /* Enhance active tab visibility on mobile */
+    .tab-button.active {
+        border-bottom-width: 4px; /* Even thicker indicator on mobile */
+    }
+
+    /* Adjust press animation timing for better mobile experience */
+    .tab-button:active:not(.active) {
+        transition: transform 0.05s ease; /* Faster feedback on mobile */
+    }
+
+    /* Ensure tab content is scrollable */
+    #tab-content {
+        padding: 12px;
+    }
+
+    /* Adjust task items for better touch */
+    .task-item {
+        padding: 14px 10px;
+        margin-bottom: 8px;
+    }
+
+    /* Make buttons more tappable */
+    button {
+        min-height: 44px;
+    }
+
+    /* Adjust FAB position */
+    #add-task-btn {
+        bottom: 16px;
+        right: 16px;
+    }
+
+    /* Ensure modals are usable on small screens */
+    .modal-content {
+        width: 90%;
+        max-width: 400px;
+        padding: 16px;
+    }
+
+    /* Hide ad spaces on mobile */
+    .ad-space {
+        display: none;
+    }
+}
 
 /* Utility Classes */
 .hidden {
