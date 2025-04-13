@@ -1,0 +1,17 @@
+{
+  "name": "task-timer",
+  "version": "1.0.0",
+  "description": "A study focus app for tracking tasks and managing time",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve",
+    "test": "echo \"No tests configured\""
+  },
+  "keywords": [
+    "task",
+    "timer",
+    "productivity"
+  ],
+  "author": "",
+  "license": "ISC"
+}

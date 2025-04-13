@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study Focus App</title>
+  <meta name="description" content="A productivity app for tracking study tasks, exercise activities, and rewards">
+  <meta name="theme-color" content="#1a73e8">
+  <link rel="stylesheet" href="styles.css">
+  <!-- Consider preloading sounds if needed -->
+  <audio id="task-complete-sound" src="sounds/win.mp3" preload="auto"></audio>
+  <!-- Add manifest for PWA support -->
+  <link rel="manifest" href="manifest.json">
+  <!-- iOS support -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+</head>
+<body>
+  <!-- Ad Spaces -->
+  <div class="left-ad ad-space"></div>
+  <div class="right-ad ad-space"></div>
+
+  <div id="app">
+    <header>
+      <h1>Study Focus App</h1>
+      <div id="user-profile">
+        <span>👤</span>
+        <div id="header-total-credits">Credits: 00:00:00</div>
+      </div>
+      <div id="current-time"></div>
+      <button id="options-btn" aria-label="Options Menu">⋮</button>
+      <div id="options-menu" class="dropdown">
+        <button id="manual-add-finished-task">Manually Add Finished Task</button>
+        <hr>
+        <label for="credit-reset-select">Credit Management:</label>
+        <select id="credit-reset-select">
+            <option value="none">None</option>
+            <option value="reset">Daily Reset</option>
+            <option value="decay">Daily Decay</option>
+        </select>
+        <div id="daily-decay-group" style="display: none;">
+            <label for="daily-decay-input">Decay %:</label>
+            <input type="number" id="daily-decay-input" min="0" max="100" value="10">
+        </div>
+        <hr>
+        <button id="clear-selected-data">Select Tasks...</button>
+        <button id="delete-selected" style="display: none;">Delete Selected</button>
+        <button id="clear-all-data">Clear All Data</button>
+        <hr>
+        <button id="export-data">Export Data</button>
+        <button id="import-data">Import Data</button>
+        <input type="file" id="import-file" accept="application/json" style="display: none;">
+        <hr>
+        <button id="toggle-dark-mode">Toggle Dark Mode</button>
+      </div>
+    </header>
+
+    <nav id="tab-navigation" role="tablist" aria-label="Task Lists">
+      <button role="tab" aria-selected="true" aria-controls="current-tasks-panel" id="tab-current" class="tab-button active">Current</button>
+      <button role="tab" aria-selected="false" aria-controls="schedule-tasks-panel" id="tab-schedule" class="tab-button">Schedule</button> <!-- New Schedule Tab -->
+      <button role="tab" aria-selected="false" aria-controls="exercise-tasks-panel" id="tab-exercise" class="tab-button">Exercise</button> <!-- Keep for potential future use or filter? -->
+      <button role="tab" aria-selected="false" aria-controls="reward-tasks-panel" id="tab-reward" class="tab-button">Reward</button> <!-- Keep for potential future use or filter? -->
+      <button role="tab" aria-selected="false" aria-controls="finished-tasks-panel" id="tab-finished" class="tab-button">Finished</button>
+    </nav>
+
+    <main id="tab-content">
+      <!-- Current Tasks Panel -->
+      <section id="current-tasks-panel" role="tabpanel" aria-labelledby="tab-current" class="tab-panel active">
+        <h2>Current Tasks</h2>
+        <div id="current-tasks-container">
+          <!-- Subject groups will be rendered here by JS -->
+        </div>
+        <div id="end-time" class="panel-footer-info"></div>
+      </section>
+
+       <!-- Schedule Panel -->
+      <section id="schedule-tasks-panel" role="tabpanel" aria-labelledby="tab-schedule" class="tab-panel">
+          <h2>Upcoming Week Schedule</h2>
+          <div id="schedule-graph-container">
+              <!-- Bar graph will be rendered here by JS -->
+          </div>
+          <div id="schedule-info" class="panel-footer-info">Tasks shown have a due date set within the next 7 days.</div>
+      </section>
+
+      <!-- Exercise Tasks Panel (Can be hidden or used for filtering later) -->
+      <section id="exercise-tasks-panel" role="tabpanel" aria-labelledby="tab-exercise" class="tab-panel">
+          <h2>Exercise Tasks</h2>
+          <!-- Content for Exercise specific view if needed, otherwise potentially remove -->
+          <p>Exercise tasks are managed within the "Current" tab.</p>
+      </section>
+
+      <!-- Reward Tasks Panel (Can be hidden or used for filtering later) -->
+      <section id="reward-tasks-panel" role="tabpanel" aria-labelledby="tab-reward" class="tab-panel">
+          <h2>Reward Tasks</h2>
+          <!-- Content for Reward specific view if needed, otherwise potentially remove -->
+           <p>Reward tasks are managed within the "Current" tab.</p>
+      </section>
+
+      <!-- Finished Tasks Panel -->
+      <section id="finished-tasks-panel" role="tabpanel" aria-labelledby="tab-finished" class="tab-panel">
+        <h2>Finished Tasks</h2>
+        <div id="finished-list-container">
+           <!-- Finished subject groups will be rendered here by JS -->
+        </div>
+        <div id="total-finished-time" class="panel-footer-info"></div>
+      </section>
+    </main>
+
+    <!-- Motivation Section -->
+    <section id="motivation">
+        <div class="motivation-card">
+            <p id="quote-text">Loading motivational quote...</p>
+            <p id="quote-author"></p>
+        </div>
+        <div class="motivation-nav">
+            <button id="prev-quote" aria-label="Previous Quote"><</button>
+            <button id="next-quote" aria-label="Next Quote">></button>
+        </div>
+    </section>
+
+
+    <button id="add-task-btn" aria-label="Add New Task">+</button>
+
+    <!-- Add Task Modal -->
+    <div id="add-task-form" class="modal">
+      <form>
+        <h3>Add New Task</h3>
+        <label for="task-type">Task Type:</label>
+        <select id="task-type">
+          <option value="study">Study</option>
+          <option value="exercise">Exercise</option>
+          <option value="reward">Reward</option>
+        </select>
+
+        <div id="subject-group" style="display: block;"> <!-- Show by default for Study -->
+           <label for="task-subject-select">Subject:</label>
+           <select id="task-subject-select">
+             <option value="">-- Select Subject --</option>
+             <option value="_new_subject_">Add New Subject...</option>
+             <!-- Populated by JS -->
+           </select>
+           <div id="new-subject-group" style="display: none;">
+               <label for="task-subject-input">New Subject Name:</label>
+               <input type="text" id="task-subject-input">
+               <button type="button" id="add-subject-btn">Add</button>
+               <button type="button" id="cancel-add-subject-btn">Cancel</button>
+           </div>
+        </div>
+
+        <label for="task-name">Task Name:</label>
+        <input type="text" id="task-name" required>
+
+        <div id="study-mode-group" style="display: block;"> <!-- Show by default for Study -->
+          <label for="mode">Mode:</label>
+          <select id="mode">
+            <option value="timer">Timer</option>
+            <option value="stopwatch">Stopwatch</option>
+          </select>
+        </div>
+
+        <div id="duration-group" style="display: block;"> <!-- Shown for Timer/Exercise/Reward -->
+          <label for="duration">Duration (minutes):</label>
+          <input type="number" id="duration" min="1" value="25">
+        </div>
+
+        <div id="reward-required-time-group" style="display: none;"> <!-- Shown for Reward -->
+          <label for="required-time-hms">Required Credits (hh:mm:ss):</label>
+          <input type="text" id="required-time-hms" placeholder="00:00:00" value="02:00:00">
+        </div>
+
+        <!-- Due Date Section -->
+        <div id="due-date-group">
+            <label class="checkbox-label">
+                <input type="checkbox" id="set-due-date-checkbox">
+                Set a due date
+            </label>
+            <div id="due-date-picker-container" style="display: none;">
+                 <label for="task-due-date">Due Date:</label>
+                 <input type="date" id="task-due-date">
+            </div>
+        </div>
+
+
+        <div class="modal-buttons">
+            <button type="submit" class="primary-button">Add Task</button>
+            <button type="button" id="cancel-add" class="secondary-button">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Manual Finished Task Modal -->
+    <div id="manual-finished-task-form" class="modal">
+      <form>
+         <h3>Manually Add Finished Task</h3>
+        <label for="finished-task-name">Task Name:</label>
+        <input type="text" id="finished-task-name" required>
+
+        <label for="manual-finished-subject-select">Subject:</label>
+        <select id="manual-finished-subject-select">
+            <option value="">-- Select Subject --</option>
+            <option value="_new_subject_">Add New Subject...</option>
+             <!-- Populated by JS -->
+        </select>
+        <!-- Add new subject elements similar to add task modal if needed -->
+
+        <label for="finished-task-time">Total Time (hh:mm:ss):</label>
+        <input type="text" id="finished-task-time" placeholder="00:00:00" required>
+        <div class="modal-buttons">
+            <button type="submit" class="primary-button">Add Task</button>
+            <button type="button" id="cancel-finished-add" class="secondary-button">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Change Subject Modal -->
+    <div id="change-subject-modal" class="modal">
+        <form>
+            <h3>Change Task Subject</h3>
+            <p>Task: <strong id="change-subject-task-name"></strong></p>
+            <label for="edit-subject-select">New Subject:</label>
+            <select id="edit-subject-select">
+                <option value="">-- Select Subject --</option>
+                <option value="_new_subject_">Add New Subject...</option>
+                <!-- Populated by JS -->
+            </select>
+             <!-- Add new subject elements similar to add task modal if needed -->
+            <div class="modal-buttons">
+                <button type="button" id="save-subject-change-btn" class="primary-button">Save</button>
+                <button type="button" id="cancel-subject-change-btn" class="secondary-button">Cancel</button>
+            </div>
+        </form>
+    </div>
+
+
+    <!-- Notification Modal -->
+    <div id="notification-modal" class="modal">
+      <div class="notification-content">
+        <p id="notification-message"></p>
+        <div id="notification-buttons">
+            <!-- Buttons added by JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Task Context Menu -->
+    <div id="task-menu" class="task-menu" style="display: none; position: absolute;">
+      <button id="move-task-btn">Move</button>
+      <button id="change-subject-btn" style="display: none;">Change Subject</button> <!-- Initially hidden -->
+      <!-- Add Edit Due Date button later if needed -->
+      <!-- <button id="edit-due-date-btn">Edit Due Date</button> -->
+      <button id="delete-task-btn" class="danger-button">Delete</button>
+    </div>
+
+  </div>
+  <script src="script.js"></script>
+  <script>
+    // Register Service Worker for offline support
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(registration => {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          })
+          .catch(error => {
+            console.log('ServiceWorker registration failed: ', error);
+          });
+      });
+    }
+  </script>
+</body>
+</html>

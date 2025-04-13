@@ -1,0 +1,1003 @@
+/* General Reset & Material Design Light Theme */
+:root {
+    --primary-color: #1a73e8; /* Google Blue */
+    --primary-color-dark: #1558b0;
+    --primary-color-light: #d2e3fc;
+    --danger-color: #d93025; /* Google Red */
+    --danger-color-dark: #a50e0e;
+    --text-color: #202124; /* Google Dark Gray */
+    --secondary-text-color: #5f6368; /* Google Medium Gray */
+    --background-color: #ffffff; /* White */
+    --secondary-background-color: #f8f9fa; /* Lighter Gray */
+    --border-color: #dadce0; /* Google Light Gray */
+    --border-color-light: #e8eaed;
+    --divider-color: #e0e0e0;
+    --hover-overlay: rgba(32, 33, 36, 0.06); /* Subtle hover */
+    --focus-ring-color: #8ab4f8; /* Light blue focus */
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --icon-color: #5f6368;
+    --active-task-bg: var(--primary-color-light); /* Light theme active task bg */
+    --active-task-border: var(--primary-color); /* Light theme active task border */
+    --modal-overlay-bg: rgba(32, 33, 36, 0.6); /* Light theme modal overlay */
+    --input-bg: var(--background-color);
+
+    --font-family: 'Segoe UI', 'Calibri', 'Arial', sans-serif;
+    --base-font-size: 14px;
+    --base-line-height: 1.5;
+
+    /* System font icons */
+    --icon-font: 'Segoe Fluent Icons', 'Segoe MDL2 Assets', system-ui;
+    --icon-expand: "\E70D"; /* ChevronDown */
+    --icon-collapse: "\E70E"; /* ChevronUp */
+
+    /* Schedule Graph Colors */
+    --graph-bar-background: var(--secondary-background-color);
+    --graph-task-study-bg: #aecbfa; /* Light Blue */
+    --graph-task-exercise-bg: #e6f4ea; /* Light Green */
+    --graph-task-reward-bg: #fef7e0; /* Light Yellow */
+    --graph-task-border: var(--border-color-light);
+}
+
+/* Dark Mode Variables */
+body.dark-mode {
+    --primary-color: #8ab4f8; /* Google Blue - Lighter for dark */
+    --primary-color-dark: #aecbfa;
+    --primary-color-light: #283142; /* Darker background shade */
+    --danger-color: #f28b82; /* Google Red - Lighter */
+    --danger-color-dark: #e67c73;
+    --text-color: #e8eaed; /* Light Gray */
+    --secondary-text-color: #9aa0a6; /* Medium Gray */
+    --background-color: #202124; /* Dark Gray */
+    --secondary-background-color: #2d2e31; /* Slightly Lighter Dark Gray */
+    --border-color: #5f6368; /* Medium Gray */
+    --border-color-light: #3c4043; /* Darker Gray */
+    --divider-color: #3c4043;
+    --hover-overlay: rgba(232, 234, 237, 0.08); /* Subtle light hover */
+    --focus-ring-color: #1a73e8; /* Use standard blue focus */
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --icon-color: #9aa0a6;
+    --active-task-bg: var(--primary-color-light); /* Dark theme active task bg (reuse var) */
+    --active-task-border: var(--primary-color); /* Dark theme active task border (reuse var) */
+    --modal-overlay-bg: rgba(0, 0, 0, 0.7); /* Darker modal overlay */
+    --input-bg: #303134; /* Dark input background */
+
+    /* Schedule Graph Colors (Dark) */
+    --graph-bar-background: var(--secondary-background-color);
+    --graph-task-study-bg: #3367d6; /* Darker Blue */
+    --graph-task-exercise-bg: #1e8e3e; /* Darker Green */
+    --graph-task-reward-bg: #f9ab00; /* Darker Yellow/Orange */
+    --graph-task-border: var(--border-color-light);
+
+    /* Invert filter for select arrow in dark mode */
+    --select-arrow-filter: invert(70%) sepia(11%) saturate(400%) hue-rotate(175deg) brightness(90%) contrast(85%);
+}
+
+
+/* Apply a natural box layout model to all elements */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--secondary-background-color); /* Use variable */
+    color: var(--text-color); /* Use variable */
+    font-family: var(--font-family);
+    font-size: var(--base-font-size);
+    line-height: var(--base-line-height);
+    min-height: 100vh;
+    display: flex; /* For ad spaces */
+    justify-content: center; /* Center app horizontally */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth theme transition */
+}
+
+/* Ad Spaces */
+.ad-space {
+    width: 160px; /* Example width */
+    /* background-color: #eee; Placeholder */
+    /* border: 1px dashed #ccc; Placeholder */
+    position: fixed; /* Or use flexbox/grid on body */
+    top: 20px;
+    height: calc(100vh - 40px); /* Example height */
+    overflow: auto;
+}
+.left-ad { left: 20px; }
+.right-ad { right: 20px; }
+
+/* Main App Container */
+#app {
+    width: 100%;
+    max-width: 800px; /* Increased width */
+    margin: 20px auto; /* Center */
+    padding: 0; /* Remove padding, handled by inner elements */
+    background-color: var(--background-color); /* Use variable */
+    border: 1px solid var(--border-color); /* Use variable */
+    border-radius: 8px; /* Slightly more rounded */
+    box-shadow: 0 1px 2px 0 var(--shadow-color), 0 1px 3px 1px var(--shadow-color); /* Use variable */
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 40px); /* Limit height */
+    overflow: hidden; /* Prevent content spilling */
+    transition: background-color 0.3s ease, border-color 0.3s ease; /* Smooth theme transition */
+}
+
+/* Header */
+header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color); /* Use variable */
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap; /* Allow wrapping on small screens */
+    gap: 10px 16px; /* Space between elements */
+    position: relative; /* For options menu positioning */
+    transition: border-color 0.3s ease; /* Smooth theme transition */
+}
+
+header h1 {
+    color: var(--text-color); /* Use variable */
+    font-size: 1.4em;
+    margin: 0;
+    font-weight: 500; /* Normal weight */
+    flex-grow: 1; /* Take available space */
+}
+
+#user-profile {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9em;
+    color: var(--secondary-text-color); /* Use variable */
+}
+#user-profile span { /* Icon */
+    font-size: 1.3em;
+}
+#header-total-credits {
+    background-color: var(--primary-color-light); /* Use variable */
+    color: var(--primary-color); /* Adjust color for contrast */
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 500;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+
+#current-time {
+    font-size: 0.9em;
+    color: var(--secondary-text-color); /* Use variable */
+    white-space: nowrap;
+}
+
+/* Tab Navigation */
+#tab-navigation {
+    display: flex;
+    border-bottom: 1px solid var(--border-color); /* Use variable */
+    background-color: var(--background-color); /* Ensure background - Use variable */
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.tab-button {
+    padding: 12px 16px; /* Reduced padding slightly for more tabs */
+    font-size: 0.95em; /* Slightly smaller text */
+    font-weight: 500;
+    color: var(--secondary-text-color); /* Use variable */
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+    margin-bottom: -1px; /* Overlap border */
+    flex-grow: 1; /* Make tabs fill space */
+    text-align: center;
+    white-space: nowrap; /* Prevent wrapping */
+}
+
+.tab-button:hover {
+    background-color: var(--hover-overlay); /* Use variable */
+    color: var(--text-color); /* Use variable */
+}
+
+.tab-button.active {
+    color: var(--primary-color); /* Use variable */
+    border-bottom-color: var(--primary-color); /* Use variable */
+}
+
+.tab-button:focus {
+    outline: none;
+    background-color: var(--hover-overlay); /* Use variable */
+}
+.tab-button:focus-visible {
+   box-shadow: 0 0 0 2px var(--focus-ring-color) inset; /* Use variable */
+}
+
+
+/* Tab Content */
+#tab-content {
+    flex-grow: 1; /* Take remaining vertical space */
+    overflow-y: auto; /* Allow scrolling within content */
+    padding: 16px;
+    background-color: var(--secondary-background-color); /* Use variable */
+    transition: background-color 0.3s ease;
+}
+
+.tab-panel {
+    display: none; /* Hide inactive tabs */
+}
+
+.tab-panel.active {
+    display: block; /* Show active tab */
+}
+
+.tab-panel h2 {
+    font-size: 1.1em;
+    font-weight: 500;
+    color: var(--text-color); /* Use variable */
+    margin: 0 0 12px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color-light); /* Use variable */
+    transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+.panel-footer-info {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color-light); /* Use variable */
+    font-size: 0.9em;
+    color: var(--secondary-text-color); /* Use variable */
+    text-align: right;
+    transition: border-color 0.3s ease, color 0.3s ease;
+}
+
+/* Subject Grouping */
+.subject-group {
+    margin-bottom: 16px;
+    border: 1px solid var(--border-color-light); /* Use variable */
+    border-radius: 4px;
+    background-color: var(--background-color); /* Use variable */
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.subject-header {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    background-color: var(--secondary-background-color); /* Use variable */
+    border-bottom: 1px solid var(--border-color-light); /* Use variable */
+    cursor: pointer; /* Indicate collapsibility */
+    border-radius: 4px 4px 0 0; /* Match container */
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+.subject-header:hover {
+    background-color: var(--hover-overlay); /* Use variable */
+}
+
+.subject-header h3 {
+    margin: 0;
+    font-size: 1em;
+    font-weight: 500;
+    flex-grow: 1;
+    color: var(--secondary-text-color); /* Use variable */
+    transition: color 0.3s ease;
+}
+
+.toggle-subject-list {
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: var(--icon-color); /* Use variable */
+    font-family: var(--icon-font); /* Use system icons */
+    font-size: 1.1em; /* Adjust size as needed */
+    line-height: 1;
+    margin-left: 8px;
+    transition: color 0.3s ease;
+}
+
+.toggle-subject-list::before {
+    content: var(--icon-expand); /* Default to expand icon */
+    transition: transform 0.2s ease-in-out;
+}
+
+.subject-group.collapsed .toggle-subject-list::before {
+    content: var(--icon-collapse); /* Change icon */
+    /* transform: rotate(90deg); Alternative if using a simple ">" */
+}
+
+.subject-tasks-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 1000px; /* Allow space for animation */
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out; /* Smooth collapse */
+    padding: 8px 0; /* Padding when open */
+}
+
+.subject-group.collapsed .subject-tasks-list {
+    max-height: 0;
+    padding: 0;
+    border-top: none; /* Avoid double border when collapsed */
+}
+
+.empty-list-message {
+    text-align: center;
+    color: var(--secondary-text-color); /* Use variable */
+    padding: 20px;
+    font-style: italic;
+    transition: color 0.3s ease;
+}
+
+
+/* List Items */
+li {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px; /* Standard padding */
+    border-bottom: 1px solid var(--border-color-light); /* Use variable */
+    position: relative;
+    gap: 10px; /* Space between elements */
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+/* Remove border from last item in a list */
+.subject-tasks-list li:last-child {
+    border-bottom: none;
+}
+
+/* Add padding for checkbox when in selection mode */
+li.selection-mode-item {
+    padding-left: 40px; /* Space for checkbox */
+}
+
+li .select-task {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    /* Optional: Style checkbox size/appearance */
+    width: 16px;
+    height: 16px;
+}
+/* Checkbox styling for dark mode */
+body.dark-mode li .select-task {
+    accent-color: var(--primary-color); /* Make checkbox match theme color */
+}
+
+
+li .task-info {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column; /* Stack name and details */
+}
+
+li .task-name {
+    font-weight: 500;
+    color: var(--text-color); /* Use variable */
+    transition: color 0.3s ease;
+}
+li .task-details {
+    font-size: 0.85em;
+    color: var(--secondary-text-color); /* Use variable */
+    transition: color 0.3s ease;
+}
+li .task-subject-label { /* Style for subject display within task */
+    font-weight: bold;
+    margin-right: 5px;
+}
+li .task-due-date { /* Style for displaying due date in task details */
+    font-style: italic;
+    margin-left: 5px;
+    color: var(--primary-color-dark); /* Use variable */
+    transition: color 0.3s ease;
+}
+
+
+li .task-timer {
+    font-weight: 500;
+    color: var(--primary-color); /* Use variable */
+    margin-left: auto; /* Push timer and controls to the right */
+    white-space: nowrap;
+    transition: color 0.3s ease;
+}
+
+li .task-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px; /* Space between buttons */
+    margin-left: 8px; /* Space from timer/name */
+}
+
+/* Active Task Styling */
+li.active-task {
+    background-color: var(--active-task-bg); /* Use variable */
+    border-left: 3px solid var(--active-task-border); /* Use variable */
+    padding-left: 13px; /* Adjust for border */
+    transition: background-color 0.3s ease, border-left-color 0.3s ease; /* Add transition */
+}
+li.active-task.selection-mode-item {
+     padding-left: 37px; /* Adjust for border + checkbox */
+}
+
+/* Disabled Task Styling */
+li.disabled-task {
+    color: var(--secondary-text-color); /* Use variable */
+    /* background-color: #f1f1f1; */ /* Optional subtle background */
+    transition: color 0.3s ease;
+}
+li.disabled-task .task-name {
+    text-decoration: line-through;
+}
+li.disabled-task .task-controls button {
+   /* Make buttons look disabled if needed, handled by JS adding disabled attr */
+   opacity: 0.6;
+}
+
+
+/* Drag and Drop Styling */
+li[draggable="true"] {
+    cursor: move;
+    opacity: 0.9;
+    /* Use semi-transparent primary color for feedback in both themes */
+    background-color: color-mix(in srgb, var(--primary-color) 20%, transparent) !important;
+}
+li.dragging {
+    opacity: 0.5; /* Make the dragged item semi-transparent */
+    border: 1px dashed var(--primary-color); /* Use variable */
+    background: color-mix(in srgb, var(--primary-color) 30%, transparent) !important; /* Use variable */
+}
+li.drag-over-top {
+   border-top: 2px solid var(--primary-color); /* Use variable */
+   margin-top: -2px; /* Prevent layout shift */
+}
+li.drag-over-bottom {
+   border-bottom: 2px solid var(--primary-color); /* Use variable */
+   margin-bottom: -2px; /* Prevent layout shift */
+}
+ul.drag-over-list { /* Style for dropping on empty list space */
+    border: 2px dashed var(--primary-color); /* Use variable */
+    background-color: color-mix(in srgb, var(--primary-color) 10%, transparent) !important; /* Use variable */
+}
+
+
+/* Button Styles (Material Inspired) */
+button {
+    font-family: var(--font-family);
+    font-size: var(--base-font-size);
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 8px 16px;
+    border: 1px solid transparent;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, color 0.2s ease; /* Add color transition */
+    font-weight: 500;
+    min-height: 36px; /* Minimum touch target size */
+    display: inline-flex; /* Align text/icons */
+    align-items: center;
+    justify-content: center;
+}
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    box-shadow: none;
+}
+button:focus {
+    outline: none;
+}
+button:focus-visible {
+    box-shadow: 0 0 0 2px var(--focus-ring-color); /* Use variable */
+}
+
+/* Text Button (Used in list items, modals) */
+.text-button, li button {
+    background-color: transparent;
+    color: var(--primary-color); /* Use variable */
+    border: none;
+    padding: 6px 8px; /* Smaller padding for text buttons */
+    min-height: auto;
+}
+.text-button:hover, li button:hover:not(:disabled) {
+    background-color: var(--hover-overlay); /* Use variable */
+}
+li button.pause-btn {
+    color: #fbbc04; /* Amber - Keep same for both themes? */
+}
+body.dark-mode li button.pause-btn {
+    color: #fdd663; /* Lighter amber for dark mode */
+}
+
+li button.stop-btn, .danger-button, button.danger-button {
+    color: var(--danger-color); /* Use variable */
+} /* Red for stop/delete */
+
+/* Outlined Button (Used in modals) */
+.secondary-button {
+    background-color: var(--background-color); /* Use variable */
+    color: var(--primary-color); /* Use variable */
+    border: 1px solid var(--border-color); /* Use variable */
+}
+.secondary-button:hover:not(:disabled) {
+    background-color: var(--hover-overlay); /* Use variable */
+    border-color: var(--border-color); /* Keep border consistent */
+}
+
+/* Contained Button (Primary actions) */
+.primary-button {
+    background-color: var(--primary-color); /* Use variable */
+    color: var(--background-color); /* Ensure contrast with primary color */
+    /* Adjust text color specifically for dark mode if primary is too light */
+    box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+}
+body.dark-mode .primary-button {
+    color: #202124; /* Dark text on light blue buttons */
+}
+
+.primary-button:hover:not(:disabled) {
+    background-color: var(--primary-color-dark); /* Use variable */
+    box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15);
+}
+.primary-button.danger-button {
+     background-color: var(--danger-color); /* Use variable */
+     color: white; /* Usually white for danger buttons */
+}
+body.dark-mode .primary-button.danger-button {
+    color: #202124; /* Dark text on light red button */
+}
+.primary-button.danger-button:hover:not(:disabled) {
+     background-color: var(--danger-color-dark); /* Use variable */
+}
+
+
+/* Icon Button (Options, Task Options, Collapse) */
+#options-btn, .task-options {
+    background: none;
+    border: none;
+    color: var(--icon-color); /* Use variable */
+    padding: 8px;
+    width: 36px; /* Square */
+    height: 36px;
+    border-radius: 50%; /* Circular */
+    font-size: 1.4em; /* Make icon larger */
+    line-height: 1;
+}
+#options-btn:hover, .task-options:hover {
+    background-color: var(--hover-overlay); /* Use variable */
+}
+
+/* Floating Action Button (FAB) */
+#add-task-btn {
+    position: fixed;
+    bottom: 24px;
+    /* Adjust position if using ad spaces */
+    /* right: calc(24px + var(--ad-width, 0px) + 20px); */
+    right: 24px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: var(--primary-color); /* Use variable */
+    color: var(--background-color); /* Ensure contrast */
+    font-size: 1.8em;
+    line-height: 1;
+    border: none;
+    box-shadow: 0 3px 5px -1px rgba(0,0,0,.2), 0 6px 10px 0 rgba(0,0,0,.14), 0 1px 18px 0 rgba(0,0,0,.12);
+    z-index: 5;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+body.dark-mode #add-task-btn {
+     color: #202124; /* Dark icon on light blue FAB */
+}
+#add-task-btn:hover {
+    background-color: var(--primary-color-dark); /* Use variable */
+    box-shadow: 0 5px 5px -3px rgba(0,0,0,.2), 0 8px 10px 1px rgba(0,0,0,.14), 0 3px 14px 2px rgba(0,0,0,.12);
+}
+
+/* Inputs & Selects */
+input[type="text"],
+input[type="number"],
+input[type="date"], /* Add styling for date input */
+input[type="time"], /* If you use time input */
+select {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    border: 1px solid var(--border-color); /* Use variable */
+    border-radius: 4px;
+    background-color: var(--input-bg); /* Use NEW variable */
+    color: var(--text-color); /* Use variable */
+    font-size: 1em;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease, color 0.3s ease; /* Add bg/color transition */
+    min-height: 38px; /* Ensure consistent height */
+}
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--primary-color); /* Use variable */
+    box-shadow: 0 0 0 2px var(--focus-ring-color); /* Use variable */
+}
+select {
+    appearance: none; /* Custom arrow */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%235f6368' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px 16px;
+    padding-right: 40px; /* Space for arrow */
+}
+/* Adjust select arrow color for dark mode */
+body.dark-mode select {
+     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%239aa0a6' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+    /* filter: var(--select-arrow-filter); Alternative using filter */
+}
+
+/* Style checkbox label for better alignment */
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    user-select: none; /* Prevent text selection on label */
+    font-weight: 500; /* Match other labels */
+    color: var(--secondary-text-color); /* Use variable */
+    font-size: 0.9em; /* Match other labels */
+    transition: color 0.3s ease;
+}
+.checkbox-label input[type="checkbox"] {
+    width: auto; /* Let checkbox size naturally */
+    margin-bottom: 0; /* Remove default margin */
+    accent-color: var(--primary-color); /* Theme checkbox */
+}
+
+/* Style date picker indicator */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(30%); /* Basic inversion for light theme */
+}
+body.dark-mode input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(70%); /* Adjust inversion for dark theme */
+}
+
+/* Modals */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; /* Enable scroll if modal content is too long */
+    background-color: var(--modal-overlay-bg); /* Use variable */
+    /* Flex properties are applied by JS when modal is opened */
+    transition: background-color 0.3s ease;
+}
+
+
+/* Hide scrollbar on body when modal is open */
+body.modal-open {
+    overflow: hidden;
+}
+
+.modal form, .modal .notification-content { /* Target both form containers and notification container */
+    background-color: var(--background-color); /* Use variable */
+    padding: 24px;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15);
+    width: 90%;
+    max-width: 450px; /* Adjusted max width slightly */
+    animation: fadeInScale 0.3s ease-out;
+    overflow: visible; /* Ensure shadows aren't clipped */
+    margin: auto; /* Added for centering if flex isn't applied yet, good fallback */
+    transition: background-color 0.3s ease;
+}
+
+@keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+
+.modal h3 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    font-size: 1.2em;
+    font-weight: 500;
+    color: var(--text-color); /* Use variable */
+    transition: color 0.3s ease;
+}
+
+.modal label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 500;
+    font-size: 0.9em;
+    color: var(--secondary-text-color); /* Use variable */
+    transition: color 0.3s ease;
+}
+/* Override for checkbox label which has its own class */
+.modal label.checkbox-label {
+    display: flex; /* Maintain flex alignment */
+}
+
+
+/* Specific group styling inside modals */
+#subject-group, #new-subject-group, #study-mode-group,
+#duration-group, #reward-required-time-group, #daily-decay-group,
+#due-date-group /* Add due date group */
+{
+    margin-bottom: 16px;
+    padding: 10px;
+    border: 1px solid var(--border-color-light); /* Use variable */
+    border-radius: 4px;
+    background-color: var(--secondary-background-color); /* Use variable */
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+#due-date-picker-container {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border-color-light); /* Use variable */
+    transition: border-color 0.3s ease;
+}
+#due-date-picker-container label {
+    margin-bottom: 4px;
+}
+
+#new-subject-group {
+    /* display: flex; /* Handled by JS now */
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+#new-subject-group label { margin-bottom: 0; }
+#new-subject-group input { flex-grow: 1; margin-bottom: 0; }
+#new-subject-group button { margin-left: auto; } /* Push buttons right */
+
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end; /* Align buttons to the right */
+    gap: 8px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color-light); /* Use variable */
+    transition: border-color 0.3s ease;
+}
+
+/* Notification Modal Specifics */
+.notification-content {
+    text-align: center;
+    padding: 24px;
+}
+#notification-message {
+    margin: 0 0 20px;
+    font-size: 1.1em;
+    line-height: 1.6;
+    color: var(--text-color); /* Use variable */
+    transition: color 0.3s ease;
+}
+.notification-message.error-message {
+    color: var(--danger-color); /* Use variable */
+    font-weight: bold;
+}
+.notification-message.danger-message { /* Add if needed for different styling */
+    color: var(--danger-color); /* Use variable */
+    font-weight: bold;
+}
+#notification-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    border-top: none; /* Remove double border */
+    padding-top: 0;
+    margin-top: 0;
+}
+
+/* Dropdowns (Task Menu, Options Menu) */
+.dropdown, .task-menu {
+    display: none;
+    position: absolute;
+    background-color: var(--background-color); /* Use variable */
+    min-width: 180px;
+    box-shadow: 0 2px 4px -1px rgba(0,0,0,.2), 0 4px 5px 0 rgba(0,0,0,.14), 0 1px 10px 0 rgba(0,0,0,.12);
+    border-radius: 4px;
+    z-index: 10;
+    padding: 8px 0; /* Vertical padding */
+    overflow: hidden;
+    border: 1px solid var(--border-color-light); /* Use variable */
+    animation: fadeIn 0.1s ease-out;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.dropdown button, .task-menu button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    padding: 8px 16px;
+    color: var(--text-color); /* Use variable */
+    font-weight: normal;
+    border-radius: 0; /* Remove radius for items */
+    min-height: auto;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+.dropdown button:hover:not(:disabled), .task-menu button:hover:not(:disabled) {
+    background-color: var(--hover-overlay); /* Use variable */
+}
+.dropdown button:disabled, .task-menu button:disabled {
+    color: var(--secondary-text-color); /* Use variable */
+    opacity: 0.7;
+    background-color: transparent;
+    cursor: not-allowed;
+}
+
+.dropdown hr {
+    border: none;
+    border-top: 1px solid var(--divider-color); /* Use variable */
+    margin: 8px 0;
+    transition: border-color 0.3s ease;
+}
+.dropdown label {
+    padding: 8px 16px 4px; /* Padding for labels */
+    font-size: 0.85em;
+    color: var(--secondary-text-color); /* Use variable */
+    display: block;
+    transition: color 0.3s ease;
+}
+.dropdown select, .dropdown input {
+    margin: 4px 16px 8px; /* Margin within dropdown */
+    width: calc(100% - 32px);
+    /* Inherit themed styles */
+}
+
+/* Specific positioning for Options Menu */
+#options-menu {
+    top: 50px; /* Position below header */
+    right: 16px;
+}
+
+/* Specific positioning for Task Menu - Handled by JS */
+#task-menu {
+    min-width: 150px; /* Slightly smaller */
+}
+
+
+/* Motivation Section */
+#motivation {
+    padding: 16px;
+    margin-top: 16px;
+    background-color: var(--background-color); /* Use variable */
+    border-top: 1px solid var(--border-color); /* Use variable */
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+.motivation-card {
+    background-color: var(--primary-color-light); /* Use variable */
+    border-radius: 4px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    text-align: center;
+    border-left: 4px solid var(--primary-color); /* Use variable */
+    transition: background-color 0.3s ease, border-left-color 0.3s ease;
+}
+#quote-text {
+    font-style: italic;
+    color: var(--text-color); /* Use variable */
+    margin: 0 0 8px 0;
+    transition: color 0.3s ease;
+}
+#quote-text strong { /* Highlight keywords? */
+   font-weight: 600;
+   color: var(--primary-color-dark); /* Use variable */
+   transition: color 0.3s ease;
+}
+#quote-author {
+    font-size: 0.9em;
+    color: var(--secondary-text-color); /* Use variable */
+    margin: 0;
+    transition: color 0.3s ease;
+}
+.motivation-nav {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+.motivation-nav button {
+    background: none;
+    border: 1px solid var(--border-color); /* Use variable */
+    color: var(--secondary-text-color); /* Use variable */
+    padding: 4px 10px;
+    min-height: auto;
+}
+.motivation-nav button:hover:not(:disabled) {
+    background-color: var(--hover-overlay); /* Use variable */
+    border-color: var(--border-color); /* Use variable */
+}
+
+/* Schedule Graph Styles */
+#schedule-graph-container {
+    display: flex;
+    justify-content: space-around; /* Space out days */
+    align-items: flex-end; /* Align bars to the bottom */
+    min-height: 250px; /* Ensure container has some height */
+    border: 1px solid var(--border-color-light); /* Use variable */
+    background-color: var(--background-color); /* Use variable */
+    padding: 10px 5px 0; /* Padding top, sides, NO bottom */
+    border-radius: 4px;
+    position: relative;
+    margin-bottom: 10px; /* Space before x-axis labels */
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.schedule-day-column {
+    flex: 1; /* Each column takes equal width */
+    display: flex;
+    flex-direction: column-reverse; /* Stack tasks from bottom up */
+    align-items: center; /* Center tasks horizontally within column */
+    margin: 0 3px; /* Small gap between columns */
+    min-height: 100%; /* Make column fill container height */
+    background-color: var(--graph-bar-background); /* Use variable */
+    border: 1px solid var(--border-color-light); /* Use variable */
+    border-bottom: none; /* Remove bottom border */
+    border-radius: 4px 4px 0 0; /* Rounded top corners */
+    position: relative; /* For label positioning */
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.schedule-task-block {
+    width: 80%; /* Width of the task block within its column */
+    height: 20px; /* Fixed height for each task */
+    margin-bottom: 2px; /* Small gap between stacked tasks */
+    border: 1px solid var(--graph-task-border); /* Use variable */
+    border-radius: 2px;
+    font-size: 0.75em;
+    line-height: 18px; /* Center text vertically */
+    text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    cursor: default; /* Or pointer if adding interaction */
+    color: var(--text-color); /* Ensure text visibility - Use variable */
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+/* Task Type Specific Colors - Use variables */
+.schedule-task-block[data-task-type="study"] {
+    background-color: var(--graph-task-study-bg);
+}
+.schedule-task-block[data-task-type="exercise"] {
+    background-color: var(--graph-task-exercise-bg);
+}
+.schedule-task-block[data-task-type="reward"] {
+    background-color: var(--graph-task-reward-bg);
+}
+/* Dark mode text contrast for schedule blocks */
+body.dark-mode .schedule-task-block {
+    color: rgba(0,0,0,0.8); /* Darker text on lighter backgrounds */
+}
+body.dark-mode .schedule-task-block[data-task-type="study"],
+body.dark-mode .schedule-task-block[data-task-type="exercise"],
+body.dark-mode .schedule-task-block[data-task-type="reward"] {
+    color: rgba(255,255,255,0.9); /* Light text on darker backgrounds */
+}
+
+.schedule-day-label {
+    font-size: 0.85em;
+    color: var(--secondary-text-color); /* Use variable */
+    margin-top: 4px; /* Space above label */
+    text-align: center;
+    width: 100%; /* Occupy full width of parent column */
+    position: absolute;
+    bottom: -20px; /* Position below the column */
+    left: 0;
+    transition: color 0.3s ease;
+}
+.schedule-day-label.today {
+    font-weight: bold;
+    color: var(--primary-color); /* Use variable */
+}
+
+
+/* Utility Classes */
+.hidden {
+    display: none !important;
+}
