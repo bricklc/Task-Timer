@@ -258,12 +258,23 @@
     // Register Service Worker for offline support
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
+        // Use relative path to avoid issues with subdirectories
+        navigator.serviceWorker.register('sw.js')
           .then(registration => {
             console.log('ServiceWorker registration successful with scope: ', registration.scope);
+
+            // Handle service worker updates
+            registration.onupdatefound = () => {
+              const installingWorker = registration.installing;
+              installingWorker.onstatechange = () => {
+                if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  console.log('New content is available; please refresh.');
+                }
+              };
+            };
           })
           .catch(error => {
-            console.log('ServiceWorker registration failed: ', error);
+            console.error('ServiceWorker registration failed: ', error);
           });
       });
     }

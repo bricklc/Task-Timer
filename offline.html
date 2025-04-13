@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Offline - Task Timer</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', 'Calibri', 'Arial', sans-serif;
+      background-color: #f8f9fa;
+      color: #202124;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    
+    .offline-container {
+      max-width: 500px;
+      background-color: white;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    
+    h1 {
+      color: #1a73e8;
+      margin-top: 0;
+    }
+    
+    p {
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    
+    .icon {
+      font-size: 60px;
+      margin-bottom: 20px;
+    }
+    
+    .button {
+      background-color: #1a73e8;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .button:hover {
+      background-color: #1558b0;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #202124;
+        color: #e8eaed;
+      }
+      
+      .offline-container {
+        background-color: #2d2e31;
+      }
+      
+      h1 {
+        color: #8ab4f8;
+      }
+      
+      .button {
+        background-color: #8ab4f8;
+        color: #202124;
+      }
+      
+      .button:hover {
+        background-color: #aecbfa;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-container">
+    <div class="icon">📶</div>
+    <h1>You're Offline</h1>
+    <p>It looks like you've lost your internet connection. The Task Timer app requires an internet connection to load initially.</p>
+    <p>Your data is safely stored on your device and will be available when you reconnect.</p>
+    <button class="button" onclick="window.location.reload()">Try Again</button>
+  </div>
+</body>
+</html>
